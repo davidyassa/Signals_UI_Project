@@ -29,7 +29,7 @@ else
     nbp = numel(bp);
 end
 
-fs,t1,t2,nbp,bp  %test
+% fs,t1,t2,nbp,bp  %test
 
 %%===================== Region Splitting =================================
 bp = sort(bp);
@@ -43,8 +43,8 @@ for k = 1:length(all_points)-1
     regions{k} = t_reg;
 end
 
-fprintf("\nRegions created successfully: %d regions\n", numel(regions));
-
+fprintf("\nRegions created successfully: %d regions\n\n", numel(regions));
+input("Press Enter to continue\n");
 
 %%========================== Main Menu ====================================
 
@@ -64,11 +64,11 @@ clc; disp(menu);
 choice = input("Choose menu option: ");
 i = 0; MAX_ATTEMPTS = 3;
 while (isempty(choice) || choice < 1 || choice > 7) && i < MAX_ATTEMPTS
-    choice = input("Error! Choose valid menu option: ");
+    choice = input("\nError! Choose valid menu option: ");
     i = i+1;
 end
 if i == MAX_ATTEMPTS 
-disp("Too many attempts, try again later.");
+disp("Too many attempts, try again later.\n");
 end
 
 %%===================== Generate the signal based on regions =================================
@@ -76,12 +76,13 @@ end
 x = [];
 
 for k = 1:length(regions)
-    fprintf("Enter parameters for region %d:\n", k);
+    fprintf("\nEnter parameters for region %d:\n", k);
     yk = generate_signal(choice, regions{k});  % call new function
     x = [x yk];
 end
 
 fprintf("\nSignal generated successfully.\n\n");
+input("Press Enter to continue\n");
 
 %%============================ Operation Menu ================================================
 
@@ -205,45 +206,58 @@ function [t_out, y_out] = apply_operation(op_choice, t, y)
 
     switch op_choice
         
-        case 1
-            s = input("Enter scaling factor: ");
-            y_out = s*y;
+        case 1   % Amplitude scaling
+            s = input("Enter scaling factor (default 1): ");
+            if isempty(s), s = 1; end
+            y_out = s * y;
             t_out = t;
 
-        case 2
+        case 2   % Time reversal
+            % no parameter needed
             t_out = -fliplr(t);
             y_out = fliplr(y);
 
-        case 3
-            sh = input("Enter shift amount: ");
+        case 3   % Time shift
+            sh = input("Enter shift amount (default 0): ");
+            if isempty(sh), sh = 0; end
             t_out = t + sh;
             y_out = y;
 
-        case 4
-            a = input("Enter expansion factor: ");
+        case 4   % Expansion
+            a = input("Enter expansion factor (default 1): ");
+            if isempty(a), a = 1; end
             t_out = t * a;
             y_out = y;
 
-        case 5
-            a = input("Enter compression factor: ");
+        case 5   % Compression
+            a = input("Enter compression factor (default 1): ");
+            if isempty(a), a = 1; end
             t_out = t / a;
             y_out = y;
 
-        case 6
-            snr = input("Enter SNR (dB): ");
+        case 6   % Add random noise
+            snr = input("Enter SNR (dB, default 30): ");
+            if isempty(snr), snr = 30; end
             y_out = awgn(y, snr, 'measured');
             t_out = t;
 
-        case 7
-            w = input("Enter window length: ");
+        case 7   % Moving-average smoothing
+            w = input("Enter window length (default 5): ");
+            if isempty(w), w = 5; end
             y_out = movmean(y, w);
             t_out = t;
 
-        case 8
+        case 8   % None
+            y_out = y;
+            t_out = t;
+
+        otherwise
+            warning("Invalid operation code. No operation applied.");
             y_out = y;
             t_out = t;
     end
 end
+
 
 %%======================= AUTO MODE (Generate 10 Random Signals) ============================
 fprintf("\nStarting AUTO MODE: Generating 10 random signals...\n");
