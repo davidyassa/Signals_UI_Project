@@ -13,20 +13,19 @@ if isempty(t2)
     t2 = 10;
 end
 
-nbp = input("Enter Number of breakpoints (default [0,-2,-3]): ");
-if ~isempty(nbp)
-    bp = zeros(1, nbp);
-    for i=1:nbp
-        in = input(sprintf("Enter breakpoint %d: ", i));
-        if ~isempty(in)
-            bp(i) = in;
-        else
-            bp(i) = 0;
-        end
+nbp = input("Enter number of breakpoints (default = 3): ");
+if isempty(nbp)
+    nbp = 3;
+end
+
+bp = zeros(1, nbp);
+for i = 1:nbp
+    in = input(sprintf("Enter breakpoint %d (default 0): ", i));
+    if isempty(in)
+        bp(i) = 0;
+    else
+        bp(i) = in;
     end
-else
-    bp = [0 -2 -3];
-    nbp = numel(bp);
 end
 
 % fs,t1,t2,nbp,bp  %test
@@ -39,7 +38,11 @@ all_points = [t1, bp, t2];
 regions = {};
 
 for k = 1:length(all_points)-1
-    t_reg = t( t >= all_points(k) & t <= all_points(k+1) );
+    if k < length(all_points)-1
+        t_reg = t(t >= all_points(k) & t < all_points(k+1));
+    else
+        t_reg = t(t >= all_points(k) & t <= all_points(k+1));
+    end
     regions{k} = t_reg;
 end
 
@@ -59,26 +62,28 @@ menu = sprintf('%s', ...
 "7) Sawtooth wave" + newline + ...
 "----------------------------" + newline);
 
-% clear screen and print menu
-clc; disp(menu);
-choice = input("Choose menu option: ");
-i = 0; MAX_ATTEMPTS = 3;
-while (isempty(choice) || choice < 1 || choice > 7) && i < MAX_ATTEMPTS
-    choice = input("\nError! Choose valid menu option: ");
-    i = i+1;
-end
-if i == MAX_ATTEMPTS 
-disp("Too many attempts, try again later.\n");
-end
+clc; 
 
 %%===================== Generate the signal based on regions =================================
 
 x = [];
+t_full = [];
 
 for k = 1:length(regions)
+
+    fprintf("\nChoose signal type for Region %d:\n", k);
+    disp(menu);
+
+    choice = input("Enter type (1–7): ");
+    while isempty(choice) || choice < 1 || choice > 7
+        choice = input("\nError! Choose valid menu option: ");
+    end
+
     fprintf("\nEnter parameters for region %d:\n", k);
-    yk = generate_signal(choice, regions{k});  % call new function
+    yk = generate_signal(choice, regions{k});
+
     x = [x yk];
+    t_full = [t_full regions{k}];
 end
 
 fprintf("\nSignal generated successfully.\n\n");
@@ -111,7 +116,7 @@ end
 
 %%===================== Apply operation =================================
 
-[t_new, x_new] = apply_operation(op_choice, t, x);
+[t_new, x_new] = apply_operation(op_choice, t_full, x);
 
 fprintf("\nOperation applied successfully.\n\n");
 
