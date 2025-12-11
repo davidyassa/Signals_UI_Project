@@ -1,4 +1,4 @@
-%%===================== User Input =================================
+%% User Input
 disp("Welcome to Final Project 9229_9634");
 fs = input("Enter sampling frequency (default 1000): ");
 if isempty(fs)
@@ -13,24 +13,32 @@ if isempty(t2)
     t2 = 10;
 end
 
-nbp = input("Enter number of breakpoints (default = 3): ");
+nbp = input("Enter number of breakpoints (default 3): ");
 if isempty(nbp)
     nbp = 3;
 end
 
+% default breakpoints
+bp_default = [-2, 0, 3];
+
 bp = zeros(1, nbp);
 for i = 1:nbp
-    in = input(sprintf("Enter breakpoint %d (default 0): ", i));
+    if i <= length(bp_default)
+        def = bp_default(i);
+    else
+        def = 0;    % for extra breakpoints
+    end
+
+    in = input(sprintf("Enter breakpoint %d (default %g): ", i, def));
     if isempty(in)
-        bp(i) = 0;
+        bp(i) = def;
     else
         bp(i) = in;
     end
 end
 
-% fs,t1,t2,nbp,bp  %test
 
-%%===================== Region Splitting =================================
+%% Region Splitting
 bp = sort(bp);
 t = t1 : 1/fs : t2;
 
@@ -49,7 +57,7 @@ end
 fprintf("\nRegions created successfully: %d regions\n\n", numel(regions));
 input("Press Enter to continue\n");
 
-%%========================== Main Menu ====================================
+%% Main Menu 
 
 menu = sprintf('%s', ...
 "----------- MENU -----------" + newline + ...
@@ -64,7 +72,7 @@ menu = sprintf('%s', ...
 
 clc; 
 
-%%===================== Generate the signal based on regions =================================
+%% Generate the signal based on regions 
 
 x = [];
 t_full = [];
@@ -74,7 +82,7 @@ for k = 1:length(regions)
     fprintf("\nChoose signal type for Region %d:\n", k);
     disp(menu);
 
-    choice = input("Enter type (1–7): ");
+    choice = input("Enter choice: ");
     while isempty(choice) || choice < 1 || choice > 7
         choice = input("\nError! Choose valid menu option: ");
     end
@@ -89,7 +97,7 @@ end
 fprintf("\nSignal generated successfully.\n\n");
 input("Press Enter to continue\n");
 
-%%============================ Operation Menu ================================================
+%% Operation Menu 
 
 opMenu = sprintf('%s', ...
 "----------- MENU -----------" + newline + ...
@@ -104,7 +112,7 @@ opMenu = sprintf('%s', ...
 "----------------------------" + newline);
 
 clc; disp(opMenu);
-op_choice = input("Choose menu option: ");
+op_choice = input("Enter choice: ");
 i = 0; MAX_ATTEMPTS = 3;
 while (isempty(op_choice) || op_choice < 1 || op_choice > 8) && i < MAX_ATTEMPTS
     op_choice = input("Error! Choose valid menu option: ");
@@ -114,22 +122,13 @@ if i == MAX_ATTEMPTS
 disp("Too many attempts, try again later.");
 end
 
-%%===================== Apply operation =================================
+% Apply operation 
 
 [t_new, x_new] = apply_operation(op_choice, t_full, x);
 
 fprintf("\nOperation applied successfully.\n\n");
 
-%%===================== Generate Signals ================================
-
-%Test case, highlight and press Ctrl+Shift+R
-% t = -5:1e-3:5;
-% x = t.^2;
-% figure
-% plot(t,x, 'LineWidth', 1);
-% save_figure();
-
-%%===================== Plot and Save =================================
+%% Plot and Save
 % Make sure vectors have the same length
 min_len = min(length(t_new), length(x_new));
 t_new = t_new(1:min_len);
@@ -146,9 +145,6 @@ save_figure();
 
 fprintf("Figure saved successfully!\n");
 
-
-%%======================== Functions ==================================
-
 function save_figure()
     fig = gcf;
 
@@ -164,7 +160,7 @@ function save_figure()
     exportgraphics(fig, fname, 'Resolution', 300);
 end
 
-%%===================== Generate Signal Function ===========================
+%% Generate Signal Function
 function y = generate_signal(choice, t)
 
     switch choice
@@ -190,7 +186,7 @@ function y = generate_signal(choice, t)
         case 5
             A = input("Enter amplitude (default 1): "); if isempty(A), A=1; end
             f = input("Enter frequency (default 1): "); if isempty(f), f=1; end
-            y = A * sin(2*pi*f*t);
+            y = A * sin(f*t);
 
         case 6
             A = input("Enter amplitude (default 1): "); if isempty(A), A=1; end
@@ -206,7 +202,7 @@ function y = generate_signal(choice, t)
 end
 
 
-%%======================= Apply Operation Function ================================
+%% Apply Operation Function
 function [t_out, y_out] = apply_operation(op_choice, t, y)
 
     switch op_choice
@@ -264,7 +260,7 @@ function [t_out, y_out] = apply_operation(op_choice, t, y)
 end
 
 
-%%======================= AUTO MODE (Generate 10 Random Signals) ============================
+%% AUTO MODE (Generate 10 Random Signals)
 fprintf("\nStarting AUTO MODE: Generating 10 random signals...\n");
 
 for k = 1:10
@@ -318,7 +314,7 @@ end
 
 fprintf("\nAUTO MODE completed successfully!\n\n");
 
-%%===================== AUTO Signal Generator Function ==========================
+%% AUTO Signal Generator Function
 function y = generate_signal_auto(choice, t)
 
     switch choice
