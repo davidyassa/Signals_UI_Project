@@ -1,4 +1,4 @@
-# Final Project 9229_9634 – Signal Generator
+# Final Project 9299_9634 – Signal Generator
 
 ## Overview
 This MATLAB project allows users to generate and manipulate various types of signals with multiple regions and operations. It supports both manual input and an automatic mode that generates random signals.
