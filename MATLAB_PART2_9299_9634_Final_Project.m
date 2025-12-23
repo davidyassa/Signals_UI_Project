@@ -94,7 +94,14 @@ for k = 1:length(regions)
     t_full = [t_full regions{k}];
 end
 
-fprintf("\nSignal generated successfully.\n\n");
+% fprintf("\nSignal generated successfully.\n\n");
+figure
+plot(t_full, x, 'LineWidth', 1);
+xlabel("Time");  ylabel("x(t)");
+title("Generated Signal");
+grid on;
+save_figure();
+
 input("Press Enter to continue\n");
 
 %% Operation Menu 
@@ -138,7 +145,7 @@ figure;
 plot(t_new, x_new, 'LineWidth', 1);
 xlabel("Time");
 ylabel("x(t)");
-title("Generated Signal");
+title("Modified Signal");
 grid on;
 
 save_figure();
